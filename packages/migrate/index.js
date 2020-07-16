@@ -124,7 +124,7 @@ const Migrate = {
 
     if (options.quiet) clone.logger = { log: function() {} };
 
-    clone.resolver = this.wrapResolver(options.resolver, clone.provider);
+    clone.resolver = this.wrapResolver(options.resolver, clone.provider, clone);
 
     // Make migrations aware of their position in sequence
     const total = migrations.length;
@@ -164,14 +164,15 @@ const Migrate = {
     }
   },
 
-  wrapResolver: function(resolver, provider) {
+  wrapResolver: function(resolver, provider, config) {
     return {
       require: function(import_path, search_path) {
         const abstraction = resolver.require(import_path, search_path);
         abstraction.setProvider(provider);
         return abstraction;
       },
-      resolve: resolver.resolve
+      resolve: resolver.resolve,
+      config: config
     };
   },
 
